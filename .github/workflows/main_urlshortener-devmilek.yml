@@ -60,4 +60,4 @@ jobs:
         uses: azure/webapps-deploy@v3
         with: 
           app-name: 'urlshortener-devmilek'
-          images: ghcr.io/${{ github.repository }}: ${{ github.sha }}
+          images: ghcr.io/${{ github.repository }}:${{ github.sha }}
