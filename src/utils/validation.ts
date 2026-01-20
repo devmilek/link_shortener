@@ -16,16 +16,20 @@ export const createLinkSchema = z.object({
     )
     .refine(
       (url) => {
-        const parsed = new URL(url);
-        const hostname = parsed.hostname. toLowerCase();
-        const privatePatterns = [
-          /^localhost$/,
-          /^127\./,
-          /^10\./,
-          /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
-          /^192\.168\./,
-        ];
-        return ! privatePatterns.some((p) => p.test(hostname));
+        try {
+         const parsed = new URL(url);
+         const hostname = parsed.hostname.toLowerCase();
+         const privatePatterns = [
+           /^localhost$/,
+           /^127\./,
+           /^10\./,
+           /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+           /^192\.168\./,
+         ];
+         return !privatePatterns.some((p) => p.test(hostname));
+        } catch {
+          return false;
+        }
       },
       { message: "Private URLs are not allowed" }
     ),
