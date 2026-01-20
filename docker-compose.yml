@@ -1,0 +1,24 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - sqlite_data:/app/data
+    environment:
+      - NODE_ENV=production
+      - DB_FILE_NAME=/app/data/sqlite.db
+      - APP_VERSION=${APP_VERSION:-1.0.0}
+      - PORT=3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://localhost:3000/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  sqlite_data:

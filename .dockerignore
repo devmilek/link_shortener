@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+
+# Git
+.git
+.gitignore
+.github
+
+# Environment files (secrets)
+.env
+.env.*
+!.env.example
+
+# IDE/Editor
+.vscode
+.idea
+.cursor
+
+# Testing
+tests
+coverage
+*.test.ts
+
+# Documentation (keep README for reference)
+*.md
+!README.md
+
+# Database files (will be created in volume)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Build artifacts
+dist
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
