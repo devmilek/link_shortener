@@ -1,65 +1,63 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - urlshortener-devmilek
+name: Build and deploy Docker to Azure
 
 on:
   push:
-    branches:
+    branches: 
       - main
-  workflow_dispatch:
+  workflow_dispatch: 
+
+env:
+  REGISTRY: ghcr. io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read #This is required for actions/checkout
+    permissions: 
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
+      - name: Set up Bun & Test
+        uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: bun test
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with: 
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: .
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with: 
+          context: . 
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}: latest
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+    needs:  build-and-push
+    permissions: 
+      id-token:  write
+      contents:  read
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: node-app
-      
-      - name: Login to Azure
+    steps: 
+      - name:  Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5054CEC8B6E141C2983E94E567C58DFD }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B4C1AC70D81F47608A01DAC8AB5B9767 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_18D9A5A6823A49AAAE62B555B7A89220 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_XXXXX }}
+          tenant-id: ${{ secrets. AZUREAPPSERVICE_TENANTID_XXXXX }}
+          subscription-id: ${{ secrets. AZUREAPPSERVICE_SUBSCRIPTIONID_XXXXX }}
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name:  Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        with:
+        with: 
           app-name: 'urlshortener-devmilek'
-          slot-name: 'Production'
-          package: .
-          
+          images: ghcr.io/${{ github.repository }}: ${{ github.sha }}
