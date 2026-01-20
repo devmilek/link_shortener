@@ -1,0 +1,21 @@
+{
+  "name": "link_shortener",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "^1.3.6",
+    "drizzle-kit": "^0.31.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.11.4",
+    "nanoid": "^5.1.6",
+    "ua-parser-js": "^2.0.8",
+    "zod": "^4.3.5"
+  }
+}
